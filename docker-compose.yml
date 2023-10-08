@@ -1,0 +1,48 @@
+---
+version: '3.9'
+services:
+  orioledb:
+    image: orioledb/orioledb:latest-pg15
+    command:
+      - postgres
+      - '-c'
+      - 'config_file=/host/config/orioledb_pg.conf'
+    environment:
+      POSTGRES_PASSWORD: pg_tps_optimizer
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+    - "5433:5432"
+    volumes:
+    - ./:/host
+  postgres:
+    image: postgres:15
+    command:
+      - postgres
+      - '-c'
+      - 'config_file=/host/config/postgresql.conf'
+    environment:
+      POSTGRES_PASSWORD: pg_tps_optimizer
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+    - "5434:5432"
+    volumes:
+    - ./:/host
+#  chainsmith:
+#    image: chainsmith
+#    volumes:
+#    - ./:/host
+#    environment:
+#      CHAINSMITH_CONFIG: /host/config/chainsmith.yml
+  pg_tps_optimizer:
+    image: mannemsolutions/pg_tps_optimizer:latest
+    platform: linux/amd64
+    volumes:
+    - ./:/host
+    environment:
+      - PGUSER=postgres
+      - PGDATABASE=postgres
+      - PGHOST
+      - PGTPSRANGE=1:1000
+#      PGSSLCERT: /host/config/tls/int_client/certs/postgres.pem
+#      PGSSLKEY: /host/config/tls/int_client/private/postgres.key.pem
+#      PGSSLROOTCERT: /host/config/tls/int_server/certs/ca-chain-bundle.cert.pem
